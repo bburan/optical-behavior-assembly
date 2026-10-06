@@ -94,6 +94,8 @@ tubing_hole_clear = 0.3; // clamp-plate hole around the tubing (on top of its st
 barb_len       = 8;
 flange_extra   = 3;    // flange diameter = spout OD + this
 flange_t       = 1.5;
+self_support_angle = 50; // printed spout: cone under the flange (and matching seat), degrees
+                         // from horizontal, so the flange prints without support
 
 /* [Fasteners] */
 m3_clear   = 3.4;
@@ -101,6 +103,8 @@ nut_w      = 5.5;      // M3 square nut (DIN 562)
 nut_t      = 1.8;
 nut_clear  = 0.2;
 csk_d      = 6.3;      // M3 countersunk head
+fc_countersunk = false; // countersunk clamp-plate screws need a 45-degree overhang on the bed
+                        // side; false = plain holes for M3x12 button/socket head screws
 clamp_lengths   = [12, 16, 18, 20, 22, 25, 30, 35, 40]; // available M3 socket head lengths
 clamp_head_d    = 6.2;
 clamp_head_h    = 3.2; // minimum counterbore depth
@@ -174,6 +178,10 @@ barb_max = tubing_id + 0.8;
 // clamp-plate hole: lets the tubing slide over the whole barb up to the flange when
 // its OD is known, otherwise only clears the barb
 fc_tube_hole_d = tubing_od > 0 ? barb_max + (tubing_od - tubing_id) + tubing_hole_clear : barb_max + 0.4;
+// self-supporting cone between the barb and the flange, and the matching seat in the clamp plate
+flange_cone_h = (flange_d - barb_max)/2 * tan(self_support_angle);
+seat_cone_h   = (flange_d + 0.3 - fc_tube_hole_d)/2 * tan(self_support_angle);
+spout_below   = barb_len + flange_cone_h + flange_t;   // spout length behind the poke's rear face
 fc_bottom  = printed_spout ? max(fc_bottom_min, flange_d/2 + m3_clear/2 + 0.8) : fc_bottom_min;
 
 nut_s    = nut_w + 2*nut_clear;
@@ -222,6 +230,7 @@ assert(groove_wall >= groove_min_wall - 0.01,
 assert(port_y0 >= 2, "lick port too close to the bottom block's outer face");
 assert(!printed_spout || barb_min - spout_id >= 1.0, "spout bore too large for the barb");
 assert(!printed_spout || fc_tube_hole_d <= flange_d - 1.0, "tubing too large for the spout flange");
+assert(!printed_spout || fc_t - flange_t - seat_cone_h >= 0.4, "clamp plate too thin for the spout seat");
 
 // ---------------------------------------------------------------- envelope
 
@@ -407,26 +416,32 @@ module friction_plate() {
         if (printed_spout) {
             translate([0, 0, -1]) cylinder(d = fc_tube_hole_d, h = fc_t + 2);
             translate([0, 0, fc_t - flange_t]) cylinder(d = flange_d + 0.3, h = flange_t + 1);
+            // conical seat for the spout's self-supporting flange cone (opens upwards: no overhang)
+            translate([0, 0, fc_t - flange_t - seat_cone_h])
+                cylinder(d1 = fc_tube_hole_d, d2 = flange_d + 0.3, h = seat_cone_h + eps);
         } else {
             translate([0, 0, -1]) cylinder(d = fc_spout_d, h = fc_t + 2);
             translate([0, 0, fc_t - oring_depth]) cylinder(d = oring_d, h = oring_depth + 1);
         }
         for (o = fc_holes) translate(o) {
             translate([0, 0, -1]) cylinder(d = m3_clear, h = fc_t + 2);
-            translate([0, 0, -eps]) cylinder(d1 = csk_d, d2 = 0, h = csk_d/2);
+            if (fc_countersunk) translate([0, 0, -eps]) cylinder(d1 = csk_d, d2 = 0, h = csk_d/2);
         }
     }
 }
 
-// printed spout in its own frame: barb end at z = 0, flange top at z = barb_len + flange_t
+// printed spout in its own frame: barb end at z = 0, flange top at z = spout_below
 // (flush with the rear face of the poke), tip at port_floor_z + spout_protrude above that
 module spout() {
     tube_h = port_floor_z + spout_protrude;
-    z_fl = barb_len;
+    z_fl = barb_len + flange_cone_h;
     difference() {
         union() {
             // two barb cones, narrow end first so the tubing pushes on and stays on
             for (z = [0, barb_len/2]) translate([0, 0, z]) cylinder(d1 = barb_min, d2 = barb_max, h = barb_len/2);
+            // self-supporting cone up to the flange (printed barb end down)
+            // (exactly flush with the barb top and flange bottom, so no sliver ledges remain)
+            translate([0, 0, barb_len]) cylinder(d1 = barb_max, d2 = flange_d, h = flange_cone_h);
             translate([0, 0, z_fl]) cylinder(d = flange_d, h = flange_t);
             translate([0, 0, z_fl + flange_t - eps]) hull() {
                 cylinder(d = spout_od, h = tube_h - spout_tip_r);
@@ -447,7 +462,7 @@ module assembly(gap = 0) {
     for (i = [0:len(layers) - 1]) color(layer_colors[i]) translate([0, i*gap, 0]) render() poke_part(layers[i]);
     color("DimGray") translate([x_c, spout_y, -gap - fc_t]) friction_plate();
     if (printed_spout)
-        color("LightSkyBlue") translate([x_c, spout_y, -2*gap - barb_len - flange_t]) spout();
+        color("LightSkyBlue") translate([x_c, spout_y, -2*gap - spout_below]) spout();
 }
 
 // print orientation: a flat (mating or outer) face on the bed

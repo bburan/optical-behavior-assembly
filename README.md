@@ -80,8 +80,13 @@ The spout is a tube with a hose barb and a flange. The water tubing is set per p
 to the flange. Rat is still set to 3.2 mm ID tubing with unknown OD.
 It slides into a bore through the fiber plates from the rear, and the clamp plate
 (`friction_plate`) holds the flange against the rear face. Print it standing on the barb
-end. Use a material suitable for drinking water (e.g. PETG or a biocompatible resin) and
-check that the bore is open and watertight before use.
+end: a 50° cone under the flange (`self_support_angle`) makes it print without support,
+and the clamp plate has a matching conical seat. Use a material suitable for drinking
+water (e.g. PETG or a biocompatible resin) and check that the bore is open and watertight
+before use.
+
+Both the spout and the friction / spout clamp plate print without support in their exported
+orientation (no downward-facing surface steeper than 45° from vertical).
 
 ### Hardware
 
@@ -89,7 +94,9 @@ check that the bore is open and watertight before use.
   + 2 square nuts in pockets in the top block's outer face (the pocket is deepened
   when needed so the screw reaches the nut)
 - 4× M3×12 countersunk front mounting screws + 4 square nuts slid in from the outer faces
-- 3× M3×12 countersunk for the friction / spout clamp plate + 3 square nuts
+- 3× M3×12 button or socket head for the friction / spout clamp plate + 3 square nuts
+  (plain holes; set `fc_countersunk = true` for countersunk screws, which adds 45°
+  overhangs on the plate's bed side)
 - mouse: 16G blunt needle as the spout (bore at the plate A / B interface)
 
 Compared with the original, this version drops the PCB mounting features, the side
