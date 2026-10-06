@@ -19,7 +19,8 @@ The parameters appear in the OpenSCAD Customizer, or you can set them on the com
 Stack, back to front: back block → fiber plate A (deep beam, 5.75 mm) → fiber plate B
 (shallow beam, 2.1 mm) → front block. Each fiber lies in the groove on the front face of
 its plate, crosses the 3.3 mm beam gap, and exits straight out of the rear (z = 0) towards
-the remote electronics box.
+the remote electronics box. Trapezoidal wings on the plate edges key into recesses in the
+back block's ears, which locates the plates during assembly (as in the original part 1).
 
 Hardware:
 - 2× M3×20 socket head (clamp the stack) + 2 square nuts in the front block's outer face

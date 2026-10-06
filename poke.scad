@@ -35,6 +35,11 @@ front_t   = 12.8;  // front block thickness
 ear_w     = 5.5;   // back-block side ears that locate the fiber plates in X
 ear_clear = 0.15;  // gap between ears and plates
 corner_r  = 1.0;   // rounding of the vertical body edges
+wing_depth  = 2.5; // plate locating wings: how far they reach into the ears
+wing_base   = 9;   // wing length along Z at the plate edge
+wing_top    = 3.5; // wing length along Z at the tip (45-degree flanks for 2.5 depth)
+wing_z      = 9.5; // wing centre along Z
+wing_fillet = 0.5; // rounding of the wing tip corners
 
 /* [Front boss / acrylic panel] */
 panel_t       = 5;     // acrylic thickness = boss height
@@ -141,15 +146,43 @@ module envelope() {
     }
 }
 
+// 2D (XZ) outline of the locating wings on both plate edges: trapezoids with
+// 45-degree flanks that key into matching recesses in the back-block ears.
+// grow > 0 gives the (larger) recess outline.
+module wings_2d(grow = 0) {
+    x0 = ear_w + ear_clear;             // plate edge
+    hb = wing_base/2;
+    ht = wing_top/2;
+    module one()
+        offset(delta = grow) offset(r = wing_fillet) offset(delta = -wing_fillet)
+            polygon([[x0 + 1, wing_z - hb], [x0, wing_z - hb], [x0 - wing_depth, wing_z - ht],
+                     [x0 - wing_depth, wing_z + ht], [x0, wing_z + hb], [x0 + 1, wing_z + hb]]);
+    one();
+    translate([body_w, 0]) mirror([1, 0]) one();
+}
+
+module wings(y0, t, grow = 0) {
+    translate([0, y0 + t, 0]) rotate([90, 0, 0]) linear_extrude(t) wings_2d(grow);
+}
+
 module layer_region(p) {
     big = top_z + 2;
     plate_w = body_w - 2*(ear_w + ear_clear);
-    if (p == "back_block") {
-        translate([-1, -1, -1]) cube([body_w + 2, back_t + 1, big]);
-        for (x = [-1, body_w - ear_w]) translate([x, y_a - eps, -1]) cube([ear_w + 1, y_f - y_a, big]);
+    if (p == "back_block") difference() {
+        union() {
+            translate([-1, -1, -1]) cube([body_w + 2, back_t + 1, big]);
+            for (x = [-1, body_w - ear_w]) translate([x, y_a - eps, -1]) cube([ear_w + 1, y_f - y_a, big]);
+        }
+        wings(y_a, y_f - y_a + 1, ear_clear);
     }
-    if (p == "fiber_plate_a") translate([ear_w + ear_clear, y_a, -1]) cube([plate_w, plate_a_t, big]);
-    if (p == "fiber_plate_b") translate([ear_w + ear_clear, y_b, -1]) cube([plate_w, plate_b_t, big]);
+    if (p == "fiber_plate_a") {
+        translate([ear_w + ear_clear, y_a, -1]) cube([plate_w, plate_a_t, big]);
+        wings(y_a, plate_a_t);
+    }
+    if (p == "fiber_plate_b") {
+        translate([ear_w + ear_clear, y_b, -1]) cube([plate_w, plate_b_t, big]);
+        wings(y_b, plate_b_t);
+    }
     if (p == "front_block")   translate([-1, y_f, -1]) cube([body_w + 2, front_t + 1, big]);
 }
 
