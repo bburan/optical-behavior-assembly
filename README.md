@@ -68,7 +68,10 @@ locating post. Approximate body size (W × D, mm):
 
 ### Printed spout (rat, ferret)
 
-The spout is a tube with a hose barb (for 3.2 mm ID tubing, `tubing_id`) and a flange.
+The spout is a tube with a hose barb and a flange. The water tubing is set per preset
+(last two columns of the `presets` table): ferret uses 3 mm (1/8") ID × 5 mm OD tubing
+(barb 3.2–3.8 mm), and the clamp-plate hole lets the tubing slide over the whole barb up
+to the flange. Rat is still set to 3.2 mm ID tubing with unknown OD.
 It slides into a bore through the fiber plates from the rear, and the clamp plate
 (`friction_plate`) holds the flange against the rear face. Print it standing on the barb
 end. Use a material suitable for drinking water (e.g. PETG or a biocompatible resin) and

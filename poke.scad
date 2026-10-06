@@ -25,19 +25,20 @@
 include <lickometer_common.scad>
 
 /* [Output] */
-part   = "exploded"; // [assembly, exploded, back_block, fiber_plate_a, fiber_plate_b, front_block, friction_plate, spout]
+part   = "assembly"; // [assembly, exploded, back_block, fiber_plate_a, fiber_plate_b, front_block, friction_plate, spout]
 animal = "ferret";  // [mouse_M, mouse_F, rat, ferret]
 explode = 8;         // gap between layers in the exploded view
 
 /* [Animal presets] */
 // name, acrylic boss, beam gap, port width, port length, port rear end (from the
-// plate stack centre), port lead-in, spout type, printed spout bore
+// plate stack centre), port lead-in, spout type, printed spout bore,
+// water tubing ID and OD for the printed spout's barb (OD 0 = unknown)
 //   beam gap  = tongue width + clearance (mouse ~2-3 mm, rat ~7.5 mm, ferret 8-12 mm)
 presets = [
-    ["mouse_M", false, 3.3,  6.0, 12.1,  5.5, 0.75, "needle",  0  ],
-    ["mouse_F", false, 3.3,  6.0, 10.6,  5.5, 0.75, "needle",  0  ],
-    ["rat",     false, 9.0, 11.0, 16.0,  8.0, 1.0,  "printed", 1.6],
-    ["ferret",  false, 13.5, 16.0, 20.0, 10.0, 1.5, "printed", 2.0],
+    ["mouse_M", false, 3.3,  6.0, 12.1,  5.5, 0.75, "needle",  0,   0,   0  ],
+    ["mouse_F", false, 3.3,  6.0, 10.6,  5.5, 0.75, "needle",  0,   0,   0  ],
+    ["rat",     false, 9.0, 11.0, 16.0,  8.0, 1.0,  "printed", 1.6, 3.2, 0  ],
+    ["ferret",  false, 13.5, 16.0, 20.0, 10.0, 1.5, "printed", 2.0, 3.0, 5.0],  // 1/8" ID x 5 mm OD
 ];
 
 /* [Body] */
@@ -88,7 +89,7 @@ spout_od_nom   = 5.3;  // printed spout OD (reduced if the plate stack is thinne
 spout_clear    = 0.15; // printed spout: radial clearance in the stack
 spout_protrude = 1.0;  // printed spout: tip height above the port floor
 spout_tip_r    = 0.6;  // printed spout: tip edge rounding
-tubing_id      = 3.2;  // water tubing pushed onto the printed spout's barb
+tubing_hole_clear = 0.3; // clamp-plate hole around the tubing (on top of its stretched OD)
 barb_len       = 8;
 flange_extra   = 3;    // flange diameter = spout OD + this
 flange_t       = 1.5;
@@ -131,6 +132,8 @@ port_back   = preset[5];
 port_flare  = preset[6];
 spout_type  = preset[7];
 spout_id    = preset[8];
+tubing_id   = preset[9];
+tubing_od   = preset[10];
 printed_spout = spout_type == "printed";
 
 plate_a_t = fiber_d + fiber_clear_d + plate_a_floor;   // groove depth + floor
@@ -166,6 +169,9 @@ spout_round  = plates_t - spout_bore_d >= 1.6;
 flange_d = spout_od + flange_extra;
 barb_min = tubing_id + 0.2;
 barb_max = tubing_id + 0.8;
+// clamp-plate hole: lets the tubing slide over the whole barb up to the flange when
+// its OD is known, otherwise only clears the barb
+fc_tube_hole_d = tubing_od > 0 ? barb_max + (tubing_od - tubing_id) + tubing_hole_clear : barb_max + 0.4;
 fc_back  = printed_spout ? max(fc_back_min, flange_d/2 + m3_clear/2 + 0.8) : fc_back_min;
 
 nut_s    = nut_w + 2*nut_clear;
@@ -184,7 +190,8 @@ clamp_cbore = L - clamp_screw_len - 0.2;   // head seat depth in the back block
 echo(str(animal, ": body ", body_w, " x ", L, " x ", top_z, " mm, beam gap ", beam_gap,
          " mm, fiber bend radius ", fiber_bend_r,
          " mm, clamp screws M3x", clamp_screw_len,
-         printed_spout ? str(", printed spout OD ", spout_od, " bore ", spout_id) : ", 16G needle spout"));
+         printed_spout ? str(", printed spout OD ", spout_od, " bore ", spout_id, ", barb ", barb_min, "-", barb_max,
+                             " for ", tubing_id, " mm ID tubing") : ", 16G needle spout"));
 
 assert(clamp_cbore < back_t - 1, "clamp screw length does not suit the stack");
 assert(x_c - fiber_x_off - groove_w/2 - (ear_w + ear_clear) >= 0.5, "fiber groove too close to the plate edge");
@@ -205,6 +212,7 @@ assert(groove_wall >= groove_min_wall - 0.01,
        str("fiber groove only ", groove_wall, " mm from a clamp screw or post hole"));
 assert(port_y0 >= 2, "lick port too close to the rear face");
 assert(!printed_spout || barb_min - spout_id >= 1.0, "spout bore too large for the barb");
+assert(!printed_spout || fc_tube_hole_d <= flange_d - 1.0, "tubing too large for the spout flange");
 
 // ---------------------------------------------------------------- envelope
 
@@ -383,7 +391,7 @@ module friction_plate() {
             for (o = fc_holes) translate(o) circle(r = fc_lobe_r);
         }
         if (printed_spout) {
-            translate([0, 0, -1]) cylinder(d = barb_max + 0.4, h = fc_t + 2);
+            translate([0, 0, -1]) cylinder(d = fc_tube_hole_d, h = fc_t + 2);
             translate([0, 0, fc_t - flange_t]) cylinder(d = flange_d + 0.3, h = flange_t + 1);
         } else {
             translate([0, 0, -1]) cylinder(d = fc_spout_d, h = fc_t + 2);
