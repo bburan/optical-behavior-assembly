@@ -29,34 +29,61 @@ block, so the fiber guides are located during assembly.
 
 | Preset | Beam gap | Lick port (W × L) | Front | Spout | Body (W × L × D) |
 |-|-|-|-|-|-|
-| `mouse_M` | 3.3 mm | 6.0 × 12.1 mm | acrylic boss | 16G needle | 37.2 × 24.5 × 24 mm |
-| `mouse_F` | 3.3 mm | 6.0 × 10.6 mm | acrylic boss | 16G needle | 37.2 × 24.5 × 24 mm |
-| `rat` | 9.0 mm | 11 × 16 mm | flat | printed, Ø5.3 / bore 1.6 | 38.6 × 28.4 × 24 mm |
-| `ferret` | 13.5 mm | 16 × 20 mm | flat | printed, Ø5.3 / bore 2.0 | 43.6 × 32.4 × 24 mm |
+| `mouse_M` | 3.3 mm | 6.0 × 12.1 mm | flat | 16G needle | 45.8 × 26.5 × 24 mm |
+| `mouse_F` | 3.3 mm | 6.0 × 10.6 mm | flat | 16G needle | 45.8 × 26.5 × 24 mm |
+| `rat` | 9.0 mm | 11 × 16 mm | flat | printed, Ø5.3 / bore 1.6 | 51.5 × 28.4 × 24 mm |
+| `ferret` | 13.5 mm | 16 × 20 mm | flat | printed, Ø5.3 / bore 2.0 | 56.0 × 32.4 × 24 mm |
+
+Body sizes are for the defaults (2 mm fiber, 10 mm bend radius).
 
 The beam gap is the tongue width plus clearance (rat ~7.5 mm, ferret 8–12 mm). Presets
 live in the `presets` table at the top of `poke.scad`. The body size, fiber routing,
 clamp screw positions and screw length are derived from the beam gap and port size.
+The acrylic-panel boss of the original can still be switched on per preset (second
+column of the table) but is off for all presets.
+
+### Fiber
+
+The grooves are sized for a 2.0 mm fiber including jacket (`fiber_d`), with SLA
+clearances: 2.3 mm wide (`fiber_clear_w`) and 2.15 mm deep (`fiber_clear_d`), so the
+mating plate closes over the fiber without pinching it. The fiber plates are the groove
+depth plus a fixed floor (`plate_a_floor` 1.35 mm, `plate_b_floor` 1.95 mm), i.e.
+3.5 and 4.1 mm for a 2 mm fiber; the blocks, posts, clamp screws and spout follow.
+The default bend radius (`fiber_bend_r`) is 10 mm; the original design used 4 mm.
+
+`fiber_bend_r` is parametric: the fiber exit positions, body width and (above ~16 mm)
+body depth grow to fit the bend, keeping a 3 mm straight run before each fiber tip
+(`fiber_tip_straight`). The lick port depth is measured from the front face
+(`port_depth`), so the spout stays within reach when the body gets deeper. The model
+refuses to render if a groove comes closer than `groove_min_wall` to a clamp screw or
+locating post. Approximate body size (W × D, mm):
+
+| `fiber_bend_r` | mouse | rat | ferret |
+|-|-|-|-|
+| 4 | 39.6 × 24 | 41.0 × 24 | 46.0 × 24 |
+| 10 (default) | 45.8 × 24 | 51.5 × 24 | 56.0 × 24 |
+| 15 | 55.8 × 24 | 61.5 × 24 | 66.0 × 24 |
+| 20 | 65.8 × 26.75 | 71.5 × 26.75 | 76.0 × 26.75 |
+| 25 | 75.8 × 31.75 | 81.5 × 31.75 | 86.0 × 31.75 |
 
 ### Printed spout (rat, ferret)
 
 The spout is a tube with a hose barb (for 3.2 mm ID tubing, `tubing_id`) and a flange.
-It slides into the channel through the fiber plates from the rear, and the clamp plate
+It slides into a bore through the fiber plates from the rear, and the clamp plate
 (`friction_plate`) holds the flange against the rear face. Print it standing on the barb
 end. Use a material suitable for drinking water (e.g. PETG or a biocompatible resin) and
 check that the bore is open and watertight before use.
 
 ### Hardware
 
-- 2× M3 socket head clamp screws (M3×20 mouse, M3×25 rat/ferret; printed in the console)
+- 2× M3 socket head clamp screws (M3×22 mouse, M3×25 rat/ferret; printed in the console)
   + 2 square nuts in the front block's outer face
 - 4× M3×12 countersunk front mounting screws + 4 square nuts slid in from the outer faces
 - 3× M3×12 countersunk for the friction / spout clamp plate + 3 square nuts
 - mouse: 16G blunt needle as the spout (bore at the plate A / B interface)
 
 Compared with the original, this version drops the PCB mounting features, the side
-fiber routing to the LED/photo holders and the part 5 LED holder. For the mouse presets
-the acrylic panel interface (Ø25 boss, screws at ±14.75 × ±8 mm) is unchanged.
+fiber routing to the LED/photo holders, the part 5 LED holder and the acrylic-panel boss.
 
 The wider rat and ferret beam gaps reduce the light reaching the receiving fiber. Check
 the receiver output (TP1/TP3, > 3 V recommended) with the fiber plates before printing
