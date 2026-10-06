@@ -2,9 +2,9 @@
 //
 // Simplified from Lickometer_Dual_Detection_Optical_Fiber-1..6.STL, keeping
 // only the functional elements:
-//   - a stack of four layers: back block, two fiber plates, front block
+//   - a stack of four layers: bottom block, two fiber plates, top block
 //   - fiber grooves that carry two plastic optical fibers across the lick
-//     slot at two depths, exiting straight out of the back of the poke
+//     slot at two depths, exiting straight out of the rear of the poke
 //   - 2x M3 clamp screws through the stack (counterbored head, captive nut)
 //   - 4x M3 front mounting screws (mouse: matching Acrylic_Plates_Lickometer_5mm_v1)
 //   - spout: 16G blunt needle (mouse) or a 3D-printed spout (rat, ferret),
@@ -16,22 +16,22 @@
 //
 // Coordinate frame (assembly):
 //   X  across the poke             (0 .. body_w)
-//   Y  stacking direction          (0 = back of back block)
-//   Z  depth; z = 0 is the rear,   z = top_z is the front face
+//   Y  stacking direction          (0 = outer face of the bottom block)
+//   Z  depth; z = 0 is the rear,   z = top_z is the front face (where the animal licks)
 //      (the animal licks in the -Z direction)
 //
 // Render a single part in print orientation with e.g.
-//   openscad -D 'part="front_block"' -D 'animal="ferret"' -o front_ferret.stl poke.scad
+//   openscad -D 'part="top_block"' -D 'animal="ferret"' -o top_ferret.stl poke.scad
 include <lickometer_common.scad>
 
 /* [Output] */
-part   = "exploded"; // [assembly, exploded, back_block, fiber_plate_a, fiber_plate_b, fiber_cover, front_block, friction_plate, spout]
+part   = "exploded"; // [assembly, exploded, bottom_block, fiber_plate_a, fiber_plate_b, fiber_cover, top_block, friction_plate, spout]
 animal = "ferret";  // [mouse_M, mouse_F, rat, ferret]
 explode = 8;         // gap between layers in the exploded view
 
 /* [Animal presets] */
-// name, acrylic boss, beam gap, port width, port length, port rear end (from the
-// plate stack centre), port lead-in, spout type, printed spout bore,
+// name, acrylic boss, beam gap, port width, port length, port bottom end (from the
+// plate stack centre, towards the bottom block), port lead-in, spout type, printed spout bore,
 // water tubing ID and OD for the printed spout's barb (OD 0 = unknown)
 //   beam gap  = tongue width + clearance (mouse ~2-3 mm, rat ~7.5 mm, ferret 8-12 mm)
 presets = [
@@ -43,15 +43,15 @@ presets = [
 
 /* [Body] */
 depth_min = 24;    // minimum rear-to-front depth (Z); grows with fiber_bend_r
-back_t_min  = 6.1; // minimum back block thickness (Y)
-front_t_min = 12.8;// minimum front block thickness
-port_rear_wall  = 3.4; // material behind the lick port in the back block
-port_front_wall = 9;   // material in front of the lick port in the front block
+bottom_t_min  = 6.1; // minimum bottom block thickness (Y)
+top_t_min = 12.8;// minimum top block thickness
+port_bottom_wall = 3.4; // bottom block material between the lick port and its outer face
+port_top_wall   = 9;    // top block material between the lick port and its outer face
 plate_a_floor = 1.35; // fiber plate A (deeper beam): material behind the groove
 plate_b_floor = 1.95; // fiber plate B (shallower beam): material behind the groove
-cover_t   = 1.2;   // fiber cover between plate B and the front block (0 = none)
+cover_t   = 1.2;   // fiber cover between plate B and the top block (0 = none)
 plate_margin = 1.45; // plate material outside the fiber groove
-ear_w     = 5.5;   // back-block side ears that locate the fiber plates in X
+ear_w     = 5.5;   // bottom-block side ears that locate the fiber plates in X
 ear_clear = 0.15;  // gap between ears and plates
 corner_r  = 1.0;   // rounding of the vertical body edges
 wing_depth  = 2.5; // plate locating wings: how far they reach into the ears
@@ -65,8 +65,8 @@ panel_t       = 5;     // thickness of the wall/panel the poke mounts behind
 boss_d        = 25;    // acrylic boss (mouse presets); panel hole is 26.2
 boss_chamfer  = 0.5;
 mount_edge_x  = 3.85;  // front mounting screws: distance from the X sides
-mount_back_y  = 4.2;   //   ... from the rear Y face
-mount_front_y = 4.3;   //   ... from the front Y face
+mount_bottom_y = 4.2;  //   ... from the bottom block's outer face
+mount_top_y   = 4.3;   //   ... from the top block's outer face
 panel_screw_len = 12;  // M3 countersunk, includes the panel thickness
 
 /* [Lick port] */
@@ -106,16 +106,16 @@ clamp_head_d    = 6.2;
 clamp_head_h    = 3.2; // minimum counterbore depth
 clamp_x_off_min = 8.0; // from centre line
 clamp_z         = 9.5;
-post_d      = 2.5;     // locating posts printed on the back block; the fiber plates slide on
+post_d      = 2.5;     // locating posts printed on the bottom block; the fiber plates slide on
 post_clear  = 0.15;    // radial clearance of the post holes
-post_engage = 2.0;     // how far the posts reach into the front block
+post_engage = 2.0;     // how far the posts reach into the top block
 post_chamfer = 0.4;    // lead-in chamfer at the post tip
 post_z      = 14;
 
 /* [Friction / spout clamp plate] */
 fc_t        = 4.5;
-fc_back_min = 5.4;     // screw offsets from the spout
-fc_front    = 7.6;
+fc_bottom_min = 5.4;     // screw offsets from the spout
+fc_top    = 7.6;
 fc_side     = 4.5;
 fc_lobe_r   = 4.5;
 oring_d     = 5;       // needle: pocket for the silicone tube / O-ring
@@ -129,7 +129,7 @@ panel_mount = preset[1];
 beam_gap    = preset[2];
 port_w      = preset[3];
 port_len    = preset[4];
-port_back   = preset[5];
+port_bottom   = preset[5];
 port_flare  = preset[6];
 spout_type  = preset[7];
 spout_id    = preset[8];
@@ -140,8 +140,8 @@ printed_spout = spout_type == "printed";
 plate_a_t = fiber_d + fiber_clear_d + plate_a_floor;   // groove depth + floor
 plate_b_t = fiber_d + fiber_clear_d + plate_b_floor;
 plates_t = plate_a_t + plate_b_t + cover_t;   // fiber plates + cover
-back_t   = max(back_t_min, port_back - plates_t/2 + port_rear_wall);
-front_t  = max(front_t_min, port_len - port_back - plates_t/2 + port_front_wall);
+bottom_t   = max(bottom_t_min, port_bottom - plates_t/2 + port_bottom_wall);
+top_t  = max(top_t_min, port_len - port_bottom - plates_t/2 + port_top_wall);
 depth    = max(depth_min, fiber_bend_r + beam_a_depth + fiber_exit_straight);
 top_z    = depth;
 body_h   = panel_mount ? depth - panel_t : depth;   // below the boss, if any
@@ -156,12 +156,12 @@ body_w   = 2*(fiber_x_off + groove_w/2 + plate_margin + ear_clear + ear_w);
 post_x_off = max(5, port_w/2 + post_d/2 + post_clear + 1.0);  // >= 1 mm wall to the lick port
 
 x_c     = body_w / 2;
-y_a     = back_t;
+y_a     = bottom_t;
 y_b     = y_a + plate_a_t;
 y_c     = y_b + plate_b_t;   // fiber cover
 y_f     = y_c + cover_t;
-L       = y_f + front_t;
-port_y0 = y_a + plates_t/2 - port_back;
+L       = y_f + top_t;
+port_y0 = y_a + plates_t/2 - port_bottom;
 // needle: in the plate A / plate B interface; printed: centred in the plate stack
 spout_y  = printed_spout ? y_a + plates_t/2 : y_b;
 spout_od = min(spout_od_nom, plates_t - 2*spout_clear);
@@ -174,26 +174,26 @@ barb_max = tubing_id + 0.8;
 // clamp-plate hole: lets the tubing slide over the whole barb up to the flange when
 // its OD is known, otherwise only clears the barb
 fc_tube_hole_d = tubing_od > 0 ? barb_max + (tubing_od - tubing_id) + tubing_hole_clear : barb_max + 0.4;
-fc_back  = printed_spout ? max(fc_back_min, flange_d/2 + m3_clear/2 + 0.8) : fc_back_min;
+fc_bottom  = printed_spout ? max(fc_bottom_min, flange_d/2 + m3_clear/2 + 0.8) : fc_bottom_min;
 
 nut_s    = nut_w + 2*nut_clear;
 nut_h    = nut_t + 2*nut_clear;
-boss_y   = (mount_back_y + L - mount_front_y)/2;
-panel_holes = [for (x = [mount_edge_x, body_w - mount_edge_x], y = [mount_back_y, L - mount_front_y]) [x, y]];
-fc_holes    = [[0, -fc_back], [-fc_side, fc_front], [fc_side, fc_front]];
+boss_y   = (mount_bottom_y + L - mount_top_y)/2;
+panel_holes = [for (x = [mount_edge_x, body_w - mount_edge_x], y = [mount_bottom_y, L - mount_top_y]) [x, y]];
+fc_holes    = [[0, -fc_bottom], [-fc_side, fc_top], [fc_side, fc_top]];
 // screw tip positions -> nut heights
 panel_nut_z = mount_z - (panel_screw_len - panel_t) + 0.6 + nut_h/2;
 fc_nut_z    = 5.0;
-// clamp screws: head seated clamp_head_h .. back_t - 1.5 deep in the back block; the nut
-// pocket comes in from the front face as deep as needed, keeping 3 mm of front block
+// clamp screws: head seated clamp_head_h .. bottom_t - 1.5 deep in the bottom block; the nut
+// pocket comes in from the top block's outer face as deep as needed, keeping 3 mm of top block
 // between it and the plates. The longest screw that fits is used.
-clamp_pmax = front_t - 3;
-function clamp_seat(l) = min(back_t - 1.5, L - 0.2 - l);
+clamp_pmax = top_t - 3;
+function clamp_seat(l) = min(bottom_t - 1.5, L - 0.2 - l);
 clamp_fits = [for (l = clamp_lengths) let(c = clamp_seat(l))
               if (c >= clamp_head_h - 0.01 && c + l >= L - clamp_pmax + nut_h - 0.01) l];
 assert(len(clamp_fits) > 0, str("no clamp screw in clamp_lengths fits a ", L, " mm stack"));
 clamp_screw_len = max(clamp_fits);
-clamp_cbore = clamp_seat(clamp_screw_len);   // head seat depth in the back block
+clamp_cbore = clamp_seat(clamp_screw_len);   // head seat depth in the bottom block
 clamp_tip   = clamp_cbore + clamp_screw_len;  // nut sits just below the screw tip
 
 echo(str(animal, ": body ", body_w, " x ", L, " x ", top_z, " mm, beam gap ", beam_gap,
@@ -202,7 +202,7 @@ echo(str(animal, ": body ", body_w, " x ", L, " x ", top_z, " mm, beam gap ", be
          printed_spout ? str(", printed spout OD ", spout_od, " bore ", spout_id, ", barb ", barb_min, "-", barb_max,
                              " for ", tubing_id, " mm ID tubing") : ", 16G needle spout"));
 
-assert(clamp_cbore < back_t - 1, "clamp screw length does not suit the stack");
+assert(clamp_cbore < bottom_t - 1, "clamp screw length does not suit the stack");
 assert(x_c - fiber_x_off - groove_w/2 - (ear_w + ear_clear) >= 0.5, "fiber groove too close to the plate edge");
 
 // groove path (one half, in u = distance from the centre line, z) vs. holes in the plates
@@ -219,7 +219,7 @@ groove_wall = min([for (zb = [top_z - beam_a_depth, top_z - beam_b_depth], h = p
                    groove_dist([h[0], h[1]], zb) - groove_w/2 - h[2]]);
 assert(groove_wall >= groove_min_wall - 0.01,
        str("fiber groove only ", groove_wall, " mm from a clamp screw or post hole"));
-assert(port_y0 >= 2, "lick port too close to the rear face");
+assert(port_y0 >= 2, "lick port too close to the bottom block's outer face");
 assert(!printed_spout || barb_min - spout_id >= 1.0, "spout bore too large for the barb");
 assert(!printed_spout || fc_tube_hole_d <= flange_d - 1.0, "tubing too large for the spout flange");
 
@@ -249,7 +249,7 @@ module envelope() {
 }
 
 // 2D (XZ) outline of the locating wings on both plate edges: trapezoids with
-// 45-degree flanks that key into matching recesses in the back-block ears.
+// 45-degree flanks that key into matching recesses in the bottom-block ears.
 // grow > 0 gives the (larger) recess outline.
 module wings_2d(grow = 0) {
     x0 = ear_w + ear_clear;             // plate edge
@@ -270,9 +270,9 @@ module wings(y0, t, grow = 0) {
 module layer_region(p) {
     big = top_z + 2;
     plate_w = body_w - 2*(ear_w + ear_clear);
-    if (p == "back_block") difference() {
+    if (p == "bottom_block") difference() {
         union() {
-            translate([-1, -1, -1]) cube([body_w + 2, back_t + 1, big]);
+            translate([-1, -1, -1]) cube([body_w + 2, bottom_t + 1, big]);
             for (x = [-1, body_w - ear_w]) translate([x, y_a - eps, -1]) cube([ear_w + 1, y_f - y_a, big]);
         }
         wings(y_a, y_f - y_a + 1, ear_clear);
@@ -289,7 +289,7 @@ module layer_region(p) {
         translate([ear_w + ear_clear, y_c, -1]) cube([plate_w, cover_t, big]);
         wings(y_c, cover_t);
     }
-    if (p == "front_block")   translate([-1, y_f, -1]) cube([body_w + 2, front_t + 1, big]);
+    if (p == "top_block")   translate([-1, y_f, -1]) cube([body_w + 2, top_t + 1, big]);
 }
 
 // ---------------------------------------------------------------- cutters
@@ -303,7 +303,7 @@ module nut_slot_y(x, y, z, y_open) {
 }
 
 module fastener_cuts() {
-    // clamp screws along Y: counterbore at the back, square nut pocket at the front
+    // clamp screws along Y: counterbore in the bottom block, square nut pocket in the top block
     for (sx = [-1, 1]) translate([x_c + sx*clamp_x_off, 0, clamp_z]) rotate([-90, 0, 0]) {
         translate([0, 0, -1]) cylinder(d = m3_clear, h = L + 2);
         translate([0, 0, -1]) cylinder(d = clamp_head_d, h = clamp_cbore + 1);
@@ -321,7 +321,7 @@ module fastener_cuts() {
         translate([x, y, -1]) cylinder(d = m3_clear, h = fc_nut_z + nut_h/2 + 3);
         nut_slot_y(x, y, fc_nut_z, y < L/2 ? 0 : L);
     }
-    // holes for the back-block locating posts: through the plates, blind in the front block
+    // holes for the bottom-block locating posts: through the plates, blind in the top block
     for (sx = [-1, 1]) translate([x_c + sx*post_x_off, y_a - eps, post_z])
         rotate([-90, 0, 0]) cylinder(d = post_d + 2*post_clear, h = plates_t + post_engage + 0.5);
     // needle bore (printed spout: see spout_channel)
@@ -377,17 +377,17 @@ module poke_part(p) {
     difference() {
         intersection() { envelope(); layer_region(p); }
         fastener_cuts();
-        if (p == "back_block" || p == "front_block") lick_port();
+        if (p == "bottom_block" || p == "top_block") lick_port();
         if (p == "fiber_plate_a") { beam_slot(y_a, plate_a_t); fiber_groove(y_b, beam_a_depth); }
         if (p == "fiber_plate_b") { beam_slot(y_b, plate_b_t); fiber_groove(y_f, beam_b_depth); }
         if (p == "fiber_cover")   beam_slot(y_c, cover_t);
         if (printed_spout && (p == "fiber_plate_a" || p == "fiber_plate_b" || p == "fiber_cover")) spout_channel();
     }
-    if (p == "back_block") locating_posts();
+    if (p == "bottom_block") locating_posts();
 }
 
-// posts on the back block's mating face; both fiber plates (each half, when
-// split by the spout channel) slide onto them, and they key into the front block
+// posts on the bottom block's mating face; both fiber plates (each half, when
+// split by the spout channel) slide onto them, and they key into the top block
 module locating_posts() {
     h = plates_t + post_engage - 0.3;
     for (sx = [-1, 1]) translate([x_c + sx*post_x_off, y_a - eps, post_z]) rotate([-90, 0, 0]) {
@@ -437,7 +437,7 @@ module spout() {
     }
 }
 
-all_layers = ["back_block", "fiber_plate_a", "fiber_plate_b", "fiber_cover", "front_block"];
+all_layers = ["bottom_block", "fiber_plate_a", "fiber_plate_b", "fiber_cover", "top_block"];
 all_colors = ["SteelBlue", "Orange", "Gold", "Tomato", "MediumSeaGreen"];
 layers       = [for (i = [0:4]) if (cover_t > 0 || all_layers[i] != "fiber_cover") all_layers[i]];
 layer_colors = [for (i = [0:4]) if (cover_t > 0 || all_layers[i] != "fiber_cover") all_colors[i]];
@@ -450,13 +450,13 @@ module assembly(gap = 0) {
         color("LightSkyBlue") translate([x_c, spout_y, -2*gap - barb_len - flange_t]) spout();
 }
 
-// print orientation: mating/back face on the bed
+// print orientation: a flat (mating or outer) face on the bed
 module print_part(p) {
-    if (p == "back_block")    rotate([90, 0, 0]) poke_part(p);
+    if (p == "bottom_block")    rotate([90, 0, 0]) poke_part(p);
     if (p == "fiber_plate_a") rotate([90, 0, 0]) translate([0, -y_a, 0]) poke_part(p);
     if (p == "fiber_plate_b") rotate([90, 0, 0]) translate([0, -y_b, 0]) poke_part(p);
     if (p == "fiber_cover" && cover_t > 0) rotate([90, 0, 0]) translate([0, -y_c, 0]) poke_part(p);
-    if (p == "front_block")   rotate([90, 0, 0]) translate([0, -y_f, 0]) poke_part(p);
+    if (p == "top_block")   rotate([90, 0, 0]) translate([0, -y_f, 0]) poke_part(p);
     if (p == "friction_plate") friction_plate();
     if (p == "spout") {
         if (printed_spout) spout();

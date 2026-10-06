@@ -10,21 +10,25 @@
 
 ## Poke (`poke.scad`)
 
-Choose the output with `part` (`assembly`, `exploded`, `back_block`, `fiber_plate_a`,
-`fiber_plate_b`, `fiber_cover`, `front_block`, `friction_plate`, `spout`) and the animal with `animal`
+Choose the output with `part` (`assembly`, `exploded`, `bottom_block`, `fiber_plate_a`,
+`fiber_plate_b`, `fiber_cover`, `top_block`, `friction_plate`, `spout`) and the animal with `animal`
 (`mouse_M`, `mouse_F`, `rat`, `ferret`). The parameters appear in the OpenSCAD Customizer,
 or you can set them on the command line:
 
-    openscad -D 'part="front_block"' -D 'animal="ferret"' -o poke_front_block.stl poke.scad
+    openscad -D 'part="top_block"' -D 'animal="ferret"' -o poke_top_block.stl poke.scad
 
-Stack, back to front: back block → fiber plate A (deep beam, 5.75 mm) → fiber plate B
-(shallow beam, 2.1 mm) → fiber cover → front block. Each fiber lies in the groove on the
-front face of its plate, crosses the beam gap, and exits straight out of the rear (z = 0)
+The stack is described with the bottom block (blue in the assembly view) at the bottom and
+the top block (green) at the top; the "front face" is the face the animal licks at and the
+"rear" is the opposite face, where the fibers and spout leave.
+
+Stack, bottom to top: bottom block → fiber plate A (deep beam, 5.75 mm) → fiber plate B
+(shallow beam, 2.1 mm) → fiber cover → top block. Each fiber lies in the groove on the
+top face of its plate, crosses the beam gap, and exits straight out of the rear (z = 0)
 towards the remote electronics box. The fiber cover (`cover_t`, 1.2 mm; 0 = none) closes
-plate B's groove right up to the beam gap, where the front block's wider lick port would
+plate B's groove right up to the beam gap, where the top block's wider lick port would
 otherwise leave the fiber exposed. Trapezoidal wings on the plates and cover key into
-recesses in the back block's ears (as in the original part 1), and two printed posts on
-the back block pass through the plates and cover into the front block, so the fiber
+recesses in the bottom block's ears (as in the original part 1), and two printed posts on
+the bottom block pass through the plates and cover into the top block, so the fiber
 guides are located during assembly.
 
 ### Animal presets
@@ -82,7 +86,7 @@ check that the bore is open and watertight before use.
 ### Hardware
 
 - 2× M3 socket head clamp screws (M3×22 mouse, M3×25 rat/ferret; printed in the console)
-  + 2 square nuts in pockets in the front block's outer face (the pocket is deepened
+  + 2 square nuts in pockets in the top block's outer face (the pocket is deepened
   when needed so the screw reaches the nut)
 - 4× M3×12 countersunk front mounting screws + 4 square nuts slid in from the outer faces
 - 3× M3×12 countersunk for the friction / spout clamp plate + 3 square nuts
