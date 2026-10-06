@@ -8,13 +8,22 @@ lickometer poke, with presets for mice, rats and ferrets.
 
 ## Attribution
 
-This work is **derived from the optical-fiber lickometer designed by the Champalimaud
-Foundation hardware team** (contact: hardware@neuro.fchampalimaud.org,
-hardware@research.fchampalimaud.org; see [`CONTRIB_ORIGINAL`](CONTRIB_ORIGINAL)). Their
-design includes the 3D-printed poke (`Lickometer_Dual_Detection_Optical_Fiber-1..6`, LED
-and photosensor holders), laser-cut acrylic panels, the electronics and Bonsai workflows.
-It was distributed under the
-[TAPR Open Hardware License v1.0](LICENSE).
+This work is **derived from the optical-fiber lickometer by Silva et al. (2024)**,
+developed at the Champalimaud Foundation:
+
+> Silva A, Carriço P, Fernandes AB, Saraiva T, Oliveira-Maia AJ, Alves da Silva J (2024).
+> High-Precision Optical Fiber-Based Lickometer. *eNeuro* 11(7):ENEURO.0189-24.2024.
+> https://doi.org/10.1523/ENEURO.0189-24.2024
+
+Original design files: https://github.com/fchampalimaud/optical-lickometer (contact:
+hardware@neuro.fchampalimaud.org, hardware@research.fchampalimaud.org; see
+[`CONTRIB_ORIGINAL`](CONTRIB_ORIGINAL)). Their design includes the 3D-printed poke
+(`Lickometer_Dual_Detection_Optical_Fiber-1..6`, LED and photosensor holders), laser-cut
+acrylic panels, the electronics and Bonsai workflows. The hardware design files are
+distributed under the [TAPR Open Hardware License v1.0](LICENSE); the article is published
+under CC BY 4.0.
+
+If you use this model, please cite the original article.
 
 The core approach is theirs: a stack of 3D-printed plates that hold plastic optical
 fibers in grooves, so that two beams cross the lick slot at two depths, clamped together
