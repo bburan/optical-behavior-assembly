@@ -1,4 +1,64 @@
-# OpenSCAD sources
+# Optical behavior assembly: parametric lickometer poke
+
+A parametric [OpenSCAD](https://openscad.org/) model of a dual-beam, optical-fiber
+lickometer poke, with presets for mice, rats and ferrets.
+
+> **Status:** not yet print-tested. Fits, clearances and the optical signal across the
+> wider rat/ferret beam gaps still need to be checked on a real print.
+
+## Attribution
+
+This work is **derived from the optical-fiber lickometer designed by the Champalimaud
+Foundation hardware team** (contact: hardware@neuro.fchampalimaud.org,
+hardware@research.fchampalimaud.org; see [`CONTRIB_ORIGINAL`](CONTRIB_ORIGINAL)). Their
+design includes the 3D-printed poke (`Lickometer_Dual_Detection_Optical_Fiber-1..6`, LED
+and photosensor holders), laser-cut acrylic panels, the electronics and Bonsai workflows.
+It was distributed under the
+[TAPR Open Hardware License v1.0](LICENSE).
+
+The core approach is theirs: a stack of 3D-printed plates that hold plastic optical
+fibers in grooves, so that two beams cross the lick slot at two depths, clamped together
+with screws and fed from a spout at the rear. This repository re-implements that approach
+as a parametric model. It is not an official release of the original authors, and they
+have not reviewed or endorsed it.
+
+## Use of AI
+
+The parametric model in this repository was developed with the help of an AI coding
+assistant (Claude, by Anthropic), working from the original authors' STL files,
+assembly instructions and design approach. The AI:
+
+- measured the original STL meshes (cross-sections, plane and hole detection) and rebuilt
+  the LED and photosensor holders as parametric OpenSCAD files;
+- wrote the simplified, parametric redesign of the poke (`poke.scad`) and its presets;
+- generated the STL exports and checked them (renders, part-overlap checks, clearance
+  checks, overhang checks).
+
+All design decisions and requirements were set and reviewed by the repository owner
+([@bburan](https://github.com/bburan)). Treat the geometry as untested until it has been
+printed and validated.
+
+## Changes from the original design
+
+As required by the TAPR OHL (section 4.2), these are the elements that were changed. The
+modifications are licensed under the terms of the TAPR Open Hardware License v1.0.
+
+- **New files:** everything in this repository is new documentation derived from the
+  original poke and holder parts. The original files themselves are not modified.
+- `led_holder.scad`, `photo_holder.scad`: parametric rebuilds of
+  `Lickometer_Dual_Detection_Optical_Fiber_LED_Holder.STL` and `..._Photo_Holder.STL`
+  (geometry within ~0.13 mm of the originals).
+- `poke.scad`: a simplified, parametric redesign of poke parts 1–6:
+  - PCB mounting features, the side fiber routing to the board-mounted LED/photosensor
+    holders, the part 5 LED holder and the acrylic-panel boss were removed;
+  - animal presets (mouse M/F, rat, ferret) set the beam gap and lick port size, and the
+    body, fiber routing and fasteners are derived from them;
+  - the fiber diameter and bend radius are parameters; the plates grow to fit them;
+  - a fiber cover plate, printed locating posts, a 3D-printed spout with hose barb (rat,
+    ferret) and a spout clamp plate were added;
+  - the parts were adjusted for printing without support on a resin (SLA) printer.
+
+## Files
 
 | File | Contents |
 |-|-|
