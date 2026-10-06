@@ -15,8 +15,7 @@ developed at the Champalimaud Foundation:
 > High-Precision Optical Fiber-Based Lickometer. *eNeuro* 11(7):ENEURO.0189-24.2024.
 > https://doi.org/10.1523/ENEURO.0189-24.2024
 
-Original design files: https://github.com/fchampalimaud/optical-lickometer (contact:
-hardware@neuro.fchampalimaud.org, hardware@research.fchampalimaud.org; see
+Original design files: https://github.com/fchampalimaud/optical-lickometer (see
 [`CONTRIB_ORIGINAL`](CONTRIB_ORIGINAL)). Their design includes the 3D-printed poke
 (`Lickometer_Dual_Detection_Optical_Fiber-1..6`, LED and photosensor holders), laser-cut
 acrylic panels, the electronics and Bonsai workflows. The hardware design files are
