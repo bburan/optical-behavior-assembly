@@ -75,6 +75,9 @@ modifications are licensed under the terms of the TAPR Open Hardware License v1.
 | `photo_holder.scad` | Faithful rebuild of `..._Photo_Holder.STL` |
 | `poke.scad` | Simplified parametric redesign of the poke (replaces parts 1–6) |
 | `stl/<animal>/` | Pre-rendered poke parts in print orientation |
+| `tools/` | Checks and measuring scripts: `check_all.py` re-exports every part and checks overlaps, stale STLs and printability; `meshtool.py`, `stl_diff.py`, `overhang.py` |
+| `DESIGN_NOTES.md` | Measurements of the original design, parameter rationale, decisions and open items |
+| `CLAUDE.md` | Working notes for AI-assisted editing (conventions, rules, commands) |
 
 ## Poke (`poke.scad`)
 
