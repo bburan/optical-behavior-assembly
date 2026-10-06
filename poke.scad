@@ -25,7 +25,7 @@
 include <lickometer_common.scad>
 
 /* [Output] */
-part   = "assembly"; // [assembly, exploded, back_block, fiber_plate_a, fiber_plate_b, front_block, friction_plate, spout]
+part   = "exploded"; // [assembly, exploded, back_block, fiber_plate_a, fiber_plate_b, fiber_cover, front_block, friction_plate, spout]
 animal = "ferret";  // [mouse_M, mouse_F, rat, ferret]
 explode = 8;         // gap between layers in the exploded view
 
@@ -49,6 +49,7 @@ port_rear_wall  = 3.4; // material behind the lick port in the back block
 port_front_wall = 9;   // material in front of the lick port in the front block
 plate_a_floor = 1.35; // fiber plate A (deeper beam): material behind the groove
 plate_b_floor = 1.95; // fiber plate B (shallower beam): material behind the groove
+cover_t   = 1.2;   // fiber cover between plate B and the front block (0 = none)
 plate_margin = 1.45; // plate material outside the fiber groove
 ear_w     = 5.5;   // back-block side ears that locate the fiber plates in X
 ear_clear = 0.15;  // gap between ears and plates
@@ -138,7 +139,7 @@ printed_spout = spout_type == "printed";
 
 plate_a_t = fiber_d + fiber_clear_d + plate_a_floor;   // groove depth + floor
 plate_b_t = fiber_d + fiber_clear_d + plate_b_floor;
-plates_t = plate_a_t + plate_b_t;
+plates_t = plate_a_t + plate_b_t + cover_t;   // fiber plates + cover
 back_t   = max(back_t_min, port_back - plates_t/2 + port_rear_wall);
 front_t  = max(front_t_min, port_len - port_back - plates_t/2 + port_front_wall);
 depth    = max(depth_min, fiber_bend_r + beam_a_depth + fiber_exit_straight);
@@ -157,7 +158,8 @@ post_x_off = max(5, port_w/2 + post_d/2 + post_clear + 1.0);  // >= 1 mm wall to
 x_c     = body_w / 2;
 y_a     = back_t;
 y_b     = y_a + plate_a_t;
-y_f     = y_b + plate_b_t;
+y_c     = y_b + plate_b_t;   // fiber cover
+y_f     = y_c + cover_t;
 L       = y_f + front_t;
 port_y0 = y_a + plates_t/2 - port_back;
 // needle: in the plate A / plate B interface; printed: centred in the plate stack
@@ -182,10 +184,17 @@ fc_holes    = [[0, -fc_back], [-fc_side, fc_front], [fc_side, fc_front]];
 // screw tip positions -> nut heights
 panel_nut_z = mount_z - (panel_screw_len - panel_t) + 0.6 + nut_h/2;
 fc_nut_z    = 5.0;
-clamp_fits = [for (l = clamp_lengths) let(c = L - l - 0.2) if (c >= clamp_head_h - 0.01 && c <= back_t - 1.5) l];
+// clamp screws: head seated clamp_head_h .. back_t - 1.5 deep in the back block; the nut
+// pocket comes in from the front face as deep as needed, keeping 3 mm of front block
+// between it and the plates. The longest screw that fits is used.
+clamp_pmax = front_t - 3;
+function clamp_seat(l) = min(back_t - 1.5, L - 0.2 - l);
+clamp_fits = [for (l = clamp_lengths) let(c = clamp_seat(l))
+              if (c >= clamp_head_h - 0.01 && c + l >= L - clamp_pmax + nut_h - 0.01) l];
 assert(len(clamp_fits) > 0, str("no clamp screw in clamp_lengths fits a ", L, " mm stack"));
 clamp_screw_len = max(clamp_fits);
-clamp_cbore = L - clamp_screw_len - 0.2;   // head seat depth in the back block
+clamp_cbore = clamp_seat(clamp_screw_len);   // head seat depth in the back block
+clamp_tip   = clamp_cbore + clamp_screw_len;  // nut sits just below the screw tip
 
 echo(str(animal, ": body ", body_w, " x ", L, " x ", top_z, " mm, beam gap ", beam_gap,
          " mm, fiber bend radius ", fiber_bend_r,
@@ -276,6 +285,10 @@ module layer_region(p) {
         translate([ear_w + ear_clear, y_b, -1]) cube([plate_w, plate_b_t, big]);
         wings(y_b, plate_b_t);
     }
+    if (p == "fiber_cover") {
+        translate([ear_w + ear_clear, y_c, -1]) cube([plate_w, cover_t, big]);
+        wings(y_c, cover_t);
+    }
     if (p == "front_block")   translate([-1, y_f, -1]) cube([body_w + 2, front_t + 1, big]);
 }
 
@@ -294,7 +307,7 @@ module fastener_cuts() {
     for (sx = [-1, 1]) translate([x_c + sx*clamp_x_off, 0, clamp_z]) rotate([-90, 0, 0]) {
         translate([0, 0, -1]) cylinder(d = m3_clear, h = L + 2);
         translate([0, 0, -1]) cylinder(d = clamp_head_d, h = clamp_cbore + 1);
-        translate([-nut_s/2, -nut_s/2, L - nut_h - 0.2]) cube([nut_s, nut_s, nut_h + 1.2]);
+        translate([-nut_s/2, -nut_s/2, clamp_tip - nut_h]) cube([nut_s, nut_s, L - clamp_tip + nut_h + 1]);
     }
     // front mounting screws, nuts slid in from the outer Y faces
     for (h = panel_holes) {
@@ -367,7 +380,8 @@ module poke_part(p) {
         if (p == "back_block" || p == "front_block") lick_port();
         if (p == "fiber_plate_a") { beam_slot(y_a, plate_a_t); fiber_groove(y_b, beam_a_depth); }
         if (p == "fiber_plate_b") { beam_slot(y_b, plate_b_t); fiber_groove(y_f, beam_b_depth); }
-        if (printed_spout && (p == "fiber_plate_a" || p == "fiber_plate_b")) spout_channel();
+        if (p == "fiber_cover")   beam_slot(y_c, cover_t);
+        if (printed_spout && (p == "fiber_plate_a" || p == "fiber_plate_b" || p == "fiber_cover")) spout_channel();
     }
     if (p == "back_block") locating_posts();
 }
@@ -423,12 +437,14 @@ module spout() {
     }
 }
 
-layers = ["back_block", "fiber_plate_a", "fiber_plate_b", "front_block"];
-layer_colors = ["SteelBlue", "Orange", "Gold", "MediumSeaGreen"];  // back block, plate A, plate B, front block
+all_layers = ["back_block", "fiber_plate_a", "fiber_plate_b", "fiber_cover", "front_block"];
+all_colors = ["SteelBlue", "Orange", "Gold", "Tomato", "MediumSeaGreen"];
+layers       = [for (i = [0:4]) if (cover_t > 0 || all_layers[i] != "fiber_cover") all_layers[i]];
+layer_colors = [for (i = [0:4]) if (cover_t > 0 || all_layers[i] != "fiber_cover") all_colors[i]];
 
 module assembly(gap = 0) {
     // render() so the preview (F5) shows each part as cut from the shared envelope
-    for (i = [0:3]) color(layer_colors[i]) translate([0, i*gap, 0]) render() poke_part(layers[i]);
+    for (i = [0:len(layers) - 1]) color(layer_colors[i]) translate([0, i*gap, 0]) render() poke_part(layers[i]);
     color("DimGray") translate([x_c, spout_y, -gap - fc_t]) friction_plate();
     if (printed_spout)
         color("LightSkyBlue") translate([x_c, spout_y, -2*gap - barb_len - flange_t]) spout();
@@ -439,6 +455,7 @@ module print_part(p) {
     if (p == "back_block")    rotate([90, 0, 0]) poke_part(p);
     if (p == "fiber_plate_a") rotate([90, 0, 0]) translate([0, -y_a, 0]) poke_part(p);
     if (p == "fiber_plate_b") rotate([90, 0, 0]) translate([0, -y_b, 0]) poke_part(p);
+    if (p == "fiber_cover" && cover_t > 0) rotate([90, 0, 0]) translate([0, -y_c, 0]) poke_part(p);
     if (p == "front_block")   rotate([90, 0, 0]) translate([0, -y_f, 0]) poke_part(p);
     if (p == "friction_plate") friction_plate();
     if (p == "spout") {

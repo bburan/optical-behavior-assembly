@@ -11,27 +11,29 @@
 ## Poke (`poke.scad`)
 
 Choose the output with `part` (`assembly`, `exploded`, `back_block`, `fiber_plate_a`,
-`fiber_plate_b`, `front_block`, `friction_plate`, `spout`) and the animal with `animal`
+`fiber_plate_b`, `fiber_cover`, `front_block`, `friction_plate`, `spout`) and the animal with `animal`
 (`mouse_M`, `mouse_F`, `rat`, `ferret`). The parameters appear in the OpenSCAD Customizer,
 or you can set them on the command line:
 
     openscad -D 'part="front_block"' -D 'animal="ferret"' -o poke_front_block.stl poke.scad
 
 Stack, back to front: back block → fiber plate A (deep beam, 5.75 mm) → fiber plate B
-(shallow beam, 2.1 mm) → front block. Each fiber lies in the groove on the front face of
-its plate, crosses the beam gap, and exits straight out of the rear (z = 0) towards the
-remote electronics box. Trapezoidal wings on the plate edges key into recesses in the
-back block's ears (as in the original part 1), and two printed posts on the back block
-pass through both plates (each half, when the spout channel splits them) into the front
-block, so the fiber guides are located during assembly.
+(shallow beam, 2.1 mm) → fiber cover → front block. Each fiber lies in the groove on the
+front face of its plate, crosses the beam gap, and exits straight out of the rear (z = 0)
+towards the remote electronics box. The fiber cover (`cover_t`, 1.2 mm; 0 = none) closes
+plate B's groove right up to the beam gap, where the front block's wider lick port would
+otherwise leave the fiber exposed. Trapezoidal wings on the plates and cover key into
+recesses in the back block's ears (as in the original part 1), and two printed posts on
+the back block pass through the plates and cover into the front block, so the fiber
+guides are located during assembly.
 
 ### Animal presets
 
 | Preset | Beam gap | Lick port (W × L) | Front | Spout | Body (W × L × D) |
 |-|-|-|-|-|-|
-| `mouse_M` | 3.3 mm | 6.0 × 12.1 mm | flat | 16G needle | 45.8 × 26.5 × 24 mm |
-| `mouse_F` | 3.3 mm | 6.0 × 10.6 mm | flat | 16G needle | 45.8 × 26.5 × 24 mm |
-| `rat` | 9.0 mm | 11 × 16 mm | flat | printed, Ø5.3 / bore 1.6 | 51.5 × 28.4 × 24 mm |
+| `mouse_M` | 3.3 mm | 6.0 × 12.1 mm | flat | 16G needle | 45.8 × 27.7 × 24 mm |
+| `mouse_F` | 3.3 mm | 6.0 × 10.6 mm | flat | 16G needle | 45.8 × 27.7 × 24 mm |
+| `rat` | 9.0 mm | 11 × 16 mm | flat | printed, Ø5.3 / bore 1.6 | 51.5 × 28.6 × 24 mm |
 | `ferret` | 13.5 mm | 16 × 20 mm | flat | printed, Ø5.3 / bore 2.0 | 56.0 × 32.4 × 24 mm |
 
 Body sizes are for the defaults (2 mm fiber, 10 mm bend radius).
@@ -80,7 +82,8 @@ check that the bore is open and watertight before use.
 ### Hardware
 
 - 2× M3 socket head clamp screws (M3×22 mouse, M3×25 rat/ferret; printed in the console)
-  + 2 square nuts in the front block's outer face
+  + 2 square nuts in pockets in the front block's outer face (the pocket is deepened
+  when needed so the screw reaches the nut)
 - 4× M3×12 countersunk front mounting screws + 4 square nuts slid in from the outer faces
 - 3× M3×12 countersunk for the friction / spout clamp plate + 3 square nuts
 - mouse: 16G blunt needle as the spout (bore at the plate A / B interface)
