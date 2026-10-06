@@ -424,10 +424,11 @@ module spout() {
 }
 
 layers = ["back_block", "fiber_plate_a", "fiber_plate_b", "front_block"];
-layer_colors = ["SteelBlue", "Orange", "Gold", "SteelBlue"];
+layer_colors = ["SteelBlue", "Orange", "Gold", "MediumSeaGreen"];  // back block, plate A, plate B, front block
 
 module assembly(gap = 0) {
-    for (i = [0:3]) color(layer_colors[i], 0.9) translate([0, i*gap, 0]) poke_part(layers[i]);
+    // render() so the preview (F5) shows each part as cut from the shared envelope
+    for (i = [0:3]) color(layer_colors[i]) translate([0, i*gap, 0]) render() poke_part(layers[i]);
     color("DimGray") translate([x_c, spout_y, -gap - fc_t]) friction_plate();
     if (printed_spout)
         color("LightSkyBlue") translate([x_c, spout_y, -2*gap - barb_len - flange_t]) spout();
